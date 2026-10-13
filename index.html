@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ລະບົບຕິດຕາມການເຄື່ອນໄຫວວຽກ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col">
+
+    <nav class="bg-indigo-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-clipboard-list text-2xl"></i>
+                    <span class="font-bold text-xl tracking-tight">ActivityTracker</span>
+                </div>
+                <div>
+                    <button id="exportBtn" class="bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i class="fas fa-download mr-2"></i>ສົ່ງອອກຂໍ້ມູນ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Sidebar Form -->
+            <div class="lg:col-span-1">
+                <div class="glass-effect rounded-2xl shadow-xl p-6 sticky top-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 border-gray-200">
+                        <i class="fas fa-plus-circle text-indigo-500 mr-2"></i>ບັນທຶກວຽກໃໝ່
+                    </h2>
+                    
+                    <form id="activityForm" class="space-y-5">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">ຫົວຂໍ້ວຽກ <span class="text-red-500">*</span></label>
+                            <input type="text" id="title" required placeholder="ເຊັ່ນ: ປະຊຸມທີມງານ, ຂຽນບົດລາຍງານ" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">ວັນທີເລີ່ມ <span class="text-red-500">*</span></label>
+                                <input type="date" id="startDate" required 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
+                            </div>
+                            <div>
+                                <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">ວັນທີສິ້ນສຸດ <span class="text-red-500">*</span></label>
+                                <input type="date" id="endDate" required 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">ໝວດໝູ່</label>
+                            <select id="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow bg-white">
+                                <option value="ປະຊຸມ">ປະຊຸມ (Meeting)</option>
+                                <option value="ພັດທະນາ">ພັດທະນາ (Development)</option>
+                                <option value="ເອກະສານ">ເອກະສານ (Documentation)</option>
+                                <option value="ລົງພື້ນທີ່">ລົງພື້ນທີ່ (Fieldwork)</option>
+                                <option value="ອື່ນໆ">ອື່ນໆ (Other)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                             <div>
+                                <label for="startTime" class="block text-sm font-medium text-gray-700 mb-1">ເລີ່ມເວລາ</label>
+                                <input type="time" id="startTime" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
+                            </div>
+                             <div>
+                                <label for="endTime" class="block text-sm font-medium text-gray-700 mb-1">ສິ້ນສຸດເວລາ</label>
+                                <input type="time" id="endTime" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
+                            </div>
+                        </div>
+
+                        <!-- Location details group -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>ສະຖານທີ່
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                                <div>
+                                    <label for="village" class="block text-xs font-medium text-gray-600 mb-1">ບ້ານ</label>
+                                    <input type="text" id="village" placeholder="ຊື່ບ້ານ..." 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow text-sm">
+                                </div>
+                                <div>
+                                    <label for="district" class="block text-xs font-medium text-gray-600 mb-1">ເມືອງ</label>
+                                    <input type="text" id="district" placeholder="ຊື່ເມືອງ..." 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow text-sm">
+                                </div>
+                                <div>
+                                    <label for="province" class="block text-xs font-medium text-gray-600 mb-1">ແຂວງ</label>
+                                    <input type="text" id="province" placeholder="ຊື່ແຂວງ..." 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="specificLocation" class="block text-xs font-medium text-gray-600 mb-1">ສະຖານທີ່ສະເພາະ (ຮ້ານ, ອາຄານ, ອື່ນໆ)</label>
+                                <input type="text" id="specificLocation" placeholder="ເຊັ່ນ: ຮ້ານກາເຟ, ຊື່ບໍລິສັດ, ໂຮງແຮມ..." 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="income" class="block text-sm font-medium text-gray-700 mb-1">ລາຍໄດ້ (₭) - ຖ້າມີ</label>
+                            <input type="number" id="income" placeholder="0" min="0" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
+                        </div>
+
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">ລາຍລະອຽດເພີ່ມເຕີມ</label>
+                            <textarea id="description" rows="3" placeholder="ອະທິບາຍໜ້າວຽກທີ່ໄດ້ເຮັດ..." 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ອັບໂຫຼດເອກະສານ (ສູງສຸດ 5MB)</label>
+                            <div class="mt-1 flex justify-center px-6 pt-4 pb-4 border-2 border-gray-300 border-dashed rounded-lg relative hover:border-indigo-500 transition-colors bg-gray-50">
+                                <div class="space-y-1 text-center">
+                                    <i class="fas fa-file-upload text-gray-400 text-2xl mb-1"></i>
+                                    <div class="flex text-sm text-gray-600 justify-center">
+                                        <label for="documentUpload" class="relative cursor-pointer bg-transparent rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                                            <span>ເລືອກເອກະສານ</span>
+                                            <input id="documentUpload" type="file" class="sr-only" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500">ຮອງຮັບ PDF, Word, ຮູບພາບ</p>
+                                    <p id="fileNameDisplay" class="text-xs text-indigo-600 font-semibold mt-2 hidden bg-indigo-50 px-2 py-1 rounded border border-indigo-100"></p>
+                                    <p id="fileErrorDisplay" class="text-xs text-red-600 font-semibold mt-2 hidden bg-red-50 px-2 py-1 rounded border border-red-100"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all transform active:scale-95 shadow-md">
+                            <i class="fas fa-save mr-2"></i>ບັນທຶກຂໍ້ມູນ
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Dashboard Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">ລວມວຽກ</p>
+                                <p id="totalActivities" class="text-2xl font-bold text-gray-900 mt-2">0</p>
+                            </div>
+                            <div class="p-3 bg-indigo-100 rounded-full">
+                                <i class="fas fa-tasks text-indigo-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">ອາທິດນີ້</p>
+                                <p id="weekActivities" class="text-2xl font-bold text-gray-900 mt-2">0</p>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-full">
+                                <i class="fas fa-calendar-week text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">ໝວດໝູ່ຫຼັກ</p>
+                                <p id="topCategory" class="text-lg font-bold text-gray-900 mt-2 truncate">-</p>
+                            </div>
+                            <div class="p-3 bg-purple-100 rounded-full">
+                                <i class="fas fa-chart-pie text-purple-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">ລາຍໄດ້ລວມ</p>
+                                <p id="totalIncome" class="text-lg font-bold text-gray-900 mt-2 truncate">0 ₭</p>
+                            </div>
+                            <div class="p-3 bg-yellow-100 rounded-full">
+                                <i class="fas fa-money-bill-wave text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity List Section -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center bg-gray-50">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 sm:mb-0">
+                            <i class="fas fa-list-alt text-indigo-500 mr-2"></i>ປະຫວັດການເຄື່ອນໄຫວ
+                        </h2>
+                        
+                        <div class="flex space-x-2 w-full sm:w-auto">
+                            <input type="text" id="searchInput" placeholder="ຄົ້ນຫາວຽກ..." 
+                                class="w-full sm:w-48 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <select id="filterCategory" class="w-full sm:w-32 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                <option value="all">ທຸກໝວດໝູ່</option>
+                                <option value="ປະຊຸມ">ປະຊຸມ</option>
+                                <option value="ພັດທະນາ">ພັດທະນາ</option>
+                                <option value="ເອກະສານ">ເອກະສານ</option>
+                                <option value="ລົງພື້ນທີ່">ລົງພື້ນທີ່</option>
+                                <option value="ອື່ນໆ">ອື່ນໆ</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="p-0">
+                        <ul id="activityList" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+                            <li id="emptyState" class="p-10 text-center text-gray-500 flex flex-col items-center">
+                                <i class="far fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                                <p class="text-lg">ຍັງບໍ່ມີຂໍ້ມູນການເຄື່ອນໄຫວ</p>
+                                <p class="text-sm">ເລີ່ມຕົ້ນໂດຍການບັນທຶກວຽກໃໝ່ຢູ່ຟອມດ້ານຊ້າຍມື</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl transform transition-transform">
+            <div class="flex items-center text-red-600 mb-4">
+                <i class="fas fa-exclamation-triangle text-2xl mr-3"></i>
+                <h3 class="text-xl font-bold text-gray-900">ຢືນຢັນການລຶບ</h3>
+            </div>
+            <p class="text-gray-600 mb-6">ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການນີ້?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelDeleteBtn" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium">ຍົກເລີກ</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-medium">
+                    <i class="fas fa-trash-alt mr-2"></i>ລຶບຂໍ້ມູນ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Status -->
+    <footer class="bg-gray-800 text-gray-300 py-6 mt-auto">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <p>&copy; <span id="currentYear"></span> Activity Tracker App.</p>
+            <div class="mt-4 md:mt-0 flex items-center text-sm bg-gray-700 px-3 py-1.5 rounded-full">
+                <span class="relative flex h-3 w-3 mr-2">
+                  <span id="cloudStatusPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                  <span id="cloudStatusDot" class="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                </span>
+                <span id="cloudStatusText">ໃຊ້ງານ Offline (ພ້ອມໃຊ້ງານທັນທີ)</span>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot }
+            from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getStorage, ref as storageRef, uploadString, getDownloadURL, deleteObject }
+            from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVxvjysA7U8SILqR7fzTlLhpq5vkkXCYU",
+            authDomain: "activity-tracker-7be2e.firebaseapp.com",
+            projectId: "activity-tracker-7be2e",
+            storageBucket: "activity-tracker-7be2e.firebasestorage.app",
+            messagingSenderId: "706749569674",
+            appId: "1:706749569674:web:ddc789702a39784995ab73",
+            measurementId: "G-N7LKXT7Y5J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        try { getAnalytics(app); } catch (e) { console.warn("Analytics unavailable:", e); }
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const activitiesCol = collection(db, 'activities');
+
+        // Upload an attachment (data URL) to Firebase Storage; returns metadata for Firestore
+        const uploadAttachment = async (id, att) => {
+            const path = `attachments/${id}_${att.name}`;
+            const r = storageRef(storage, path);
+            await uploadString(r, att.data, 'data_url');
+            const url = await getDownloadURL(r);
+            return { name: att.name, type: att.type, url, path };
+        };
+
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        let activities = [];
+        let currentAttachment = null;
+        let deleteTargetId = null;
+
+
+        const activityForm = document.getElementById('activityForm');
+        const activityList = document.getElementById('activityList');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        const filterCategory = document.getElementById('filterCategory');
+        const exportBtn = document.getElementById('exportBtn');
+        const documentUpload = document.getElementById('documentUpload');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const fileErrorDisplay = document.getElementById('fileErrorDisplay');
+        
+        const totalActivitiesEl = document.getElementById('totalActivities');
+        const weekActivitiesEl = document.getElementById('weekActivities');
+        const topCategoryEl = document.getElementById('topCategory');
+        const totalIncomeEl = document.getElementById('totalIncome');
+
+        const confirmModal = document.getElementById('confirmModal');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        documentUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            fileErrorDisplay.classList.add('hidden');
+            
+            if (!file) {
+                currentAttachment = null;
+                fileNameDisplay.classList.add('hidden');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                fileErrorDisplay.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ຂະໜາດໄຟລ໌ໃຫຍ່ເກີນໄປ (ຈຳກັດ 5MB)`;
+                fileErrorDisplay.classList.remove('hidden');
+                this.value = '';
+                currentAttachment = null;
+                fileNameDisplay.classList.add('hidden');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                currentAttachment = {
+                    name: file.name,
+                    type: file.type,
+                    data: event.target.result
+                };
+                fileNameDisplay.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${file.name}`;
+                fileNameDisplay.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('startDate').valueAsDate = new Date();
+        document.getElementById('endDate').valueAsDate = new Date();
+        
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        
+        startDateInput.addEventListener('change', function() {
+            if (endDateInput.value < this.value) {
+                endDateInput.value = this.value;
+            }
+            endDateInput.min = this.value;
+        });
+
+        const getCategoryStyle = (category) => {
+            const styles = {
+                'ປະຊຸມ': 'bg-blue-100 text-blue-800 border-blue-200',
+                'ພັດທະນາ': 'bg-green-100 text-green-800 border-green-200',
+                'ເອກະສານ': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                'ລົງພື້ນທີ່': 'bg-orange-100 text-orange-800 border-orange-200',
+                'ອື່ນໆ': 'bg-gray-100 text-gray-800 border-gray-200'
+            };
+            return styles[category] || styles['ອື່ນໆ'];
+        };
+
+        const getCategoryIcon = (category) => {
+             const icons = {
+                'ປະຊຸມ': 'fa-users',
+                'ພັດທະນາ': 'fa-code',
+                'ເອກະສານ': 'fa-file-alt',
+                'ລົງພື້ນທີ່': 'fa-map-marked-alt',
+                'ອື່ນໆ': 'fa-asterisk'
+            };
+            return icons[category] || 'fa-tasks';
+        };
+
+        const formatTimeDisplay = (start, end) => {
+            if (start && end) return `${start} - ${end}`;
+            if (start) return `ເລີ່ມ: ${start}`;
+            if (end) return `ສິ້ນສຸດ: ${end}`;
+            return 'ບໍ່ໄດ້ລະບຸເວລາ';
+        };
+
+        const formatDateDisplay = (dateString) => {
+            if(!dateString) return '';
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('lo-LA', options);
+        };
+
+        const formatFullDateDisplay = (startStr, endStr) => {
+            if(!startStr) return '';
+            const start = formatDateDisplay(startStr);
+            const end = endStr ? formatDateDisplay(endStr) : start;
+            if (start === end) return start;
+            return `${start} - ${end}`;
+        };
+
+        const formatCurrency = (amount) => {
+            if (!amount) return '';
+            return new Intl.NumberFormat('lo-LA').format(amount) + ' ₭';
+        };
+
+        const formatLocationDisplay = (specificLocation, village, district, province) => {
+            const parts = [];
+            if (specificLocation) parts.push(specificLocation);
+            if (village) parts.push(`ບ.${village}`);
+            if (district) parts.push(`ມ.${district}`);
+            if (province) parts.push(`ຂ.${province}`);
+            return parts.length > 0 ? parts.join(', ') : '';
+        };
+
+        const renderActivities = () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filterValue = filterCategory.value;
+
+            const sortedActivities = [...activities].sort((a, b) => new Date(b.startDate || b.date || 0) - new Date(a.startDate || a.date || 0));
+
+            const filteredActivities = sortedActivities.filter(act => {
+                const matchesSearch = (act.title || '').toLowerCase().includes(searchTerm) || 
+                                      (act.description && act.description.toLowerCase().includes(searchTerm));
+                const matchesCategory = filterValue === 'all' || act.category === filterValue;
+                return matchesSearch && matchesCategory;
+            });
+
+            activityList.innerHTML = '';
+
+            if (filteredActivities.length === 0) {
+                if (activities.length === 0) {
+                    activityList.appendChild(emptyState);
+                } else {
+                    activityList.innerHTML = `<li class="p-8 text-center text-gray-500"><p>ບໍ່ພົບຂໍ້ມູນທີ່ຕົງກັບການຄົ້ນຫາ</p></li>`;
+                }
+                updateDashboard();
+                return;
+            }
+
+            filteredActivities.forEach(activity => {
+                const li = document.createElement('li');
+                li.className = 'p-6 hover:bg-gray-50 transition-colors duration-150 group';
+                
+                const timeStr = formatTimeDisplay(activity.startTime, activity.endTime);
+                const catStyle = getCategoryStyle(activity.category);
+                const catIcon = getCategoryIcon(activity.category);
+                
+                const startDateStr = activity.startDate || activity.date;
+                const endDateStr = activity.endDate || activity.date;
+                const locationStr = formatLocationDisplay(activity.specificLocation, activity.village, activity.district, activity.province);
+
+                li.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start space-x-4 w-full">
+                            <div class="flex-shrink-0 mt-1">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center ${catStyle.split(' ')[0]} ${catStyle.split(' ')[1]} bg-opacity-50">
+                                    <i class="fas ${catIcon}"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-lg font-bold text-gray-900">${activity.title}</h3>
+                                <div class="flex flex-wrap items-center mt-1 text-sm text-gray-500 gap-y-2">
+                                    <span class="flex items-center mr-4">
+                                        <i class="far fa-calendar-alt mr-1.5 text-indigo-400"></i>
+                                        ${formatFullDateDisplay(startDateStr, endDateStr)}
+                                    </span>
+                                    <span class="flex items-center mr-4">
+                                        <i class="far fa-clock mr-1.5 text-indigo-400"></i>
+                                        ${timeStr}
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${catStyle} mr-4">
+                                        ${activity.category}
+                                    </span>
+                                    ${locationStr ? `
+                                    <span class="flex items-center text-gray-600 mr-4 bg-gray-100 px-2.5 py-0.5 rounded-full border border-gray-200">
+                                        <i class="fas fa-map-marker-alt mr-1.5 text-red-500"></i>
+                                        ${locationStr}
+                                    </span>
+                                    ` : ''}
+                                    ${activity.income ? `
+                                    <span class="flex items-center text-green-700 font-semibold bg-green-50 px-2.5 py-0.5 rounded-full border border-green-200">
+                                        <i class="fas fa-coins mr-1.5 text-green-500"></i>
+                                        ${formatCurrency(activity.income)}
+                                    </span>
+                                    ` : ''}
+                                </div>
+                                ${activity.description ? `<p class="mt-3 text-gray-600 text-sm bg-gray-50 p-3 rounded-md border border-gray-100">${activity.description.replace(/\n/g, '<br>')}</p>` : ''}
+                                ${activity.attachment ? `
+                                <div class="mt-3">
+                                    <a href="${activity.attachment.url || activity.attachment.data}" target="_blank" rel="noopener" download="${activity.attachment.name}" class="inline-flex items-center text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md border border-indigo-200 text-sm transition-colors shadow-sm cursor-pointer">
+                                        <i class="fas fa-paperclip mr-2 text-indigo-500"></i>
+                                        <span class="mr-2 truncate max-w-[200px]">${activity.attachment.name}</span>
+                                        <i class="fas fa-download text-xs opacity-70"></i>
+                                    </a>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <button onclick="window.requestDelete('${activity.id}')" class="flex-shrink-0 text-red-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 ml-2" title="ລຶບລາຍການນີ້">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                activityList.appendChild(li);
+            });
+
+            updateDashboard();
+        };
+
+        activityForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = activityForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>ກຳລັງບັນທຶກ...';
+
+            const newActivity = {
+                id: Date.now().toString(),
+                title: document.getElementById('title').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                category: document.getElementById('category').value,
+                startTime: document.getElementById('startTime').value,
+                endTime: document.getElementById('endTime').value,
+                specificLocation: document.getElementById('specificLocation').value,
+                village: document.getElementById('village').value,
+                district: document.getElementById('district').value,
+                province: document.getElementById('province').value,
+                income: parseFloat(document.getElementById('income').value) || 0,
+                description: document.getElementById('description').value,
+                attachment: currentAttachment,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                let attachmentWarning = '';
+                if (currentAttachment) {
+                    try {
+                        newActivity.attachment = await uploadAttachment(newActivity.id, currentAttachment);
+                    } catch (upErr) {
+                        console.error("Attachment upload failed: ", upErr);
+                        newActivity.attachment = null;
+                        attachmentWarning = 'ບັນທຶກວຽກແລ້ວ ແຕ່ອັບໂຫຼດເອກະສານບໍ່ສຳເລັດ (ກວດ Firebase Storage)';
+                    }
+                }
+                await setDoc(doc(db, 'activities', newActivity.id), newActivity);
+
+                document.getElementById('title').value = '';
+                document.getElementById('startTime').value = '';
+                document.getElementById('endTime').value = '';
+                document.getElementById('specificLocation').value = '';
+                document.getElementById('village').value = '';
+                document.getElementById('district').value = '';
+                document.getElementById('province').value = '';
+                document.getElementById('income').value = '';
+                document.getElementById('description').value = '';
+                documentUpload.value = '';
+                currentAttachment = null;
+                fileNameDisplay.classList.add('hidden');
+                fileErrorDisplay.classList.add('hidden');
+                if (attachmentWarning) {
+                    fileErrorDisplay.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${attachmentWarning}`;
+                    fileErrorDisplay.classList.remove('hidden');
+                }
+
+                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>ບັນທຶກສຳເລັດ';
+                submitBtn.classList.replace('bg-indigo-600', 'bg-green-600');
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.classList.replace('bg-green-600', 'bg-indigo-600');
+                    submitBtn.disabled = false;
+                }, 1500);
+
+            } catch (err) {
+                console.error("Error saving: ", err);
+                fileErrorDisplay.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ບໍ່ສາມາດບັນທຶກໄດ້ (${err.code || err.message}). ກວດ Firestore Rules.`;
+                fileErrorDisplay.classList.remove('hidden');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        window.requestDelete = (id) => {
+            deleteTargetId = id;
+            confirmModal.classList.remove('hidden');
+        };
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteTargetId = null;
+            confirmModal.classList.add('hidden');
+        });
+
+        confirmDeleteBtn.addEventListener('click', async () => {
+            if (!deleteTargetId) return;
+            
+            confirmDeleteBtn.disabled = true;
+            try {
+                const target = activities.find(a => a.id === deleteTargetId);
+                await deleteDoc(doc(db, 'activities', deleteTargetId));
+                if (target && target.attachment && target.attachment.path) {
+                    try { await deleteObject(storageRef(storage, target.attachment.path)); }
+                    catch (delErr) { console.warn("Could not delete attachment:", delErr); }
+                }
+                confirmModal.classList.add('hidden');
+            } catch (err) {
+                console.error("Error deleting: ", err);
+            } finally {
+                confirmDeleteBtn.disabled = false;
+                deleteTargetId = null;
+            }
+        });
+
+        const updateDashboard = () => {
+            totalActivitiesEl.textContent = activities.length;
+
+            const now = new Date();
+            const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+            startOfWeek.setHours(0,0,0,0);
+            
+            const thisWeekCount = activities.filter(a => {
+                const actDate = new Date(a.startDate || a.date || 0);
+                return actDate >= startOfWeek;
+            }).length;
+            weekActivitiesEl.textContent = thisWeekCount;
+
+            if (activities.length === 0) {
+                topCategoryEl.textContent = '-';
+            } else {
+                const categoryCounts = activities.reduce((acc, curr) => {
+                    acc[curr.category] = (acc[curr.category] || 0) + 1;
+                    return acc;
+                }, {});
+                const topCat = Object.keys(categoryCounts).reduce((a, b) => categoryCounts[a] > categoryCounts[b] ? a : b);
+                topCategoryEl.textContent = topCat;
+            }
+
+            const totalIncome = activities.reduce((sum, act) => sum + (Number(act.income) || 0), 0);
+            totalIncomeEl.textContent = new Intl.NumberFormat('lo-LA').format(totalIncome) + ' ₭';
+        };
+
+        exportBtn.addEventListener('click', () => {
+            if(activities.length === 0) return;
+            const headers = ['ຫົວຂໍ້', 'ວັນທີເລີ່ມ', 'ວັນທີສິ້ນສຸດ', 'ໝວດໝູ່', 'ເລີ່ມເວລາ', 'ສິ້ນສຸດເວລາ', 'ສະຖານທີ່ສະເພາະ', 'ບ້ານ', 'ເມືອງ', 'ແຂວງ', 'ລາຍໄດ້', 'ລາຍລະອຽດ'];
+            const csvContent = [
+                headers.join(','),
+                ...activities.map(a => 
+                    `"${a.title || ''}","${a.startDate || ''}","${a.endDate || ''}","${a.category || ''}","${a.startTime || ''}","${a.endTime || ''}","${(a.specificLocation || '').replace(/"/g, '""')}","${a.village || ''}","${a.district || ''}","${a.province || ''}","${a.income || 0}","${(a.description || '').replace(/"/g, '""')}"`
+                )
+            ].join('\n');
+
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `activity_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.click();
+        });
+
+        searchInput.addEventListener('input', renderActivities);
+        filterCategory.addEventListener('change', renderActivities);
+
+        // Live sync from Firestore
+        onSnapshot(activitiesCol, (snapshot) => {
+            activities = snapshot.docs.map(d => d.data());
+            renderActivities();
+        }, (err) => {
+            console.error("Firestore error: ", err);
+            activityList.innerHTML = `<li class="p-8 text-center text-red-500"><p>ເຊື່ອມຕໍ່ Firestore ບໍ່ໄດ້ (${err.code}). ກວດ Rules ແລະ ວ່າສ້າງ Database ແລ້ວ.</p></li>`;
+        });
+
+        // One-time migration of data previously saved in this browser's localStorage
+        (async () => {
+            const KEY = 'activities_data_v3';
+            if (localStorage.getItem('firestore_migrated_v1')) return;
+            let old = [];
+            try { old = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
+            if (!Array.isArray(old) || old.length === 0) return;
+            try {
+                for (const a of old) {
+                    const item = { ...a, id: String(a.id || Date.now() + Math.random()) };
+                    if (item.attachment && item.attachment.data) {
+                        try { item.attachment = await uploadAttachment(item.id, item.attachment); }
+                        catch (e) { item.attachment = null; }
+                    }
+                    await setDoc(doc(db, 'activities', item.id), item);
+                }
+                localStorage.setItem('firestore_migrated_v1', '1'); // old data is kept, not deleted
+            } catch (e) { console.error("Migration failed:", e); }
+        })();
+    </script>
+</body>
+</html>
